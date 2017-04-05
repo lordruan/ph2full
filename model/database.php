@@ -35,22 +35,22 @@ class Database
         return self::$db;
     }
 
-    public function getAll($table = null)
+    public function getAll($table = null, $ativo)
     {
         if (!is_null($table)){
             try {
-                $sql = sprintf("SELECT * FROM %s", $table);
+                $sql = sprintf("SELECT * FROM %s WHERE ativo = %s", $table, $ativo);
                 $stm = self::$db->prepare($sql);
                 $stm->execute();
                 $dados = $stm->fetchAll(PDO::FETCH_OBJ);
                 return [true,$dados];
             } catch (PDOException $e) {
-                return [false,$e];
+                return [false,$e->getMessage()];
             }
         }
     }
     public function inserir($table = null, $campos = null,$dados = null)
-    {
+    {   
         if (!is_null($table))
         if (!is_null($campos))
         if (!is_null($dados))
@@ -62,7 +62,7 @@ class Database
                 $retorno = self::$db->lastInsertId();
                 return [true,$retorno];
             } catch (PDOException $e) {
-                return [false,$e];
+                return [false,$e->getMessage()];
             }
         }
     }
@@ -75,7 +75,57 @@ class Database
                 $dados = $stm->fetchAll(PDO::FETCH_OBJ);
                 return [true,$dados];
             } catch (PDOException $e) {
-                return [false,$e];
+                return [false,$e->getMessage()];
+            }
+        }
+    }
+
+    public function delete($table = null,$id=null)
+    {
+        if (!is_null($table))
+        if (!is_null($id)){
+            try {
+                $sql = sprintf("UPDATE `%s` SET `ativo` = false where `id` = %s", $table, $id);
+                $stm = self::$db->prepare($sql);
+                $stm->execute();
+                $dados = $stm;
+                return [true,$dados];
+            } catch (PDOException $e) {
+                return [false,$e->getMessage()];
+            }
+        }
+    }
+
+
+    public function edit($table = null,$capos_values = null,$id=null)
+    {
+        if (!is_null($capos_values))
+        if (!is_null($table))
+        if (!is_null($id)){
+            try {
+                $sql = sprintf("UPDATE `%s` SET %s where `id` = %s", $table,$capos_values, $id);
+                $stm = self::$db->prepare($sql);
+                $stm->execute();
+                $dados = $stm;
+                return [true,$dados];
+            } catch (PDOException $e) {
+                return [false,$e->getMessage()];
+            }
+        }
+    }
+
+    public function byId($table = null,$id=null)
+    {
+        if (!is_null($table))
+        if (!is_null($id)){
+            try {
+                $sql = sprintf("select * from `%s` where `id` = %s", $table, $id);
+                $stm = self::$db->prepare($sql);
+                $stm->execute();
+                $dados = $stm->fetchAll(PDO::FETCH_OBJ);
+                return [true,$dados];
+            } catch (PDOException $e) {
+                return [false,$e->getMessage()];
             }
         }
     }
